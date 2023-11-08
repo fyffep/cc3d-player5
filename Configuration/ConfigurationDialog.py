@@ -142,82 +142,46 @@ class ConfigurationDialog(QDialog, ui_configurationdlg.Ui_CC3DPrefs, Configurati
 
     def createMovieButtonClicked(self):
 
+        #TODO
         inputPath = 'C:/Users/Pete/CC3DWorkspace/cellsort_2D_cc3d_11_04_2023_19_53_54/Cell_Field_CellField_2D_XY_25'
-        # inputPath = 'c:/Users/Pete/Pictures/ScreenShot'
 
         temp_file_path = None
         with tempfile.NamedTemporaryFile(delete=False, mode='+a', dir=inputPath) as temp_file:
-            # 'delete=True' ensures that the temporary file is deleted when closed
-            temp_file_path = temp_file.name
+            # 'delete=True' removes the temporary file when it is closed.
+            # So, setting 'delete=True' ensures that the tempfile stays active long enough for FFMPEG to read it.
 
             for fileName in os.listdir(inputPath):
                 if fileName.lower().endswith(".png"):
                     temp_file.write(f"file '{fileName}'\n")
             temp_file.close()
 
-            frameRate = 80
-            quality = 48
-            outputPath = 'C:/Users/Pete/CC3DWorkspace/cellsort_2D_cc3d_11_04_2023_19_53_54/movies/newMovie2.mp4'
-            outputFrameRateTxt = 60
-            outputFrameRate = str(min(outputFrameRateTxt, 30))
+            frameRate = min(self.frameRateSpinBox.value(), 1);
+            quality = 30
 
-        # TODO test if inputPath can contain spaces
+            #Number the file name so that it does not overwrite another movie
+            fileNumber = 0
+            outputPath = 'C:/Users/Pete/CC3DWorkspace/cellsort_2D_cc3d_11_04_2023_19_53_54/movies/'
+            while os.path.exists(os.path.join(outputPath, f"movie{fileNumber}.mp4")):
+                fileNumber += 1
+            outputPath = os.path.join(outputPath, f"movie{fileNumber}.mp4")
 
-        # subprocess.run([
-        #     "ffmpeg",
-        #     "-y",
-        #     "-framerate", str(frameRate),
-        #     "-i", temp_file_path,
-        #     #video codec: H.264
-        #     "-c:v", "libx264",
-        #     #slow processing for better compression
-        #     "-preset", "slow",
-        #     #scale image in case of width or height is not divisible by 2
-        #     "-tune", "animation",
-        #     #use YUV420p color space
-        #     "-vf", "scale='trunc(iw/2)*2:trunc(ih/2)*2',format=yuv420p",
-        #     #set quality (constant rate factor, crf): 51=worst, 0=best
-        #     "-crf", str(quality),
-        #     #output frame rate
-        #     "-r", str(outputFrameRate),
-        #     #output filename
-        #     outputPath
-        # ])
+            # TODO test if inputPath can contain spaces
 
-        print(
-            "ffmpeg",
-            # output frame rate
-            "-r", "1",
-            "-f", "concat",
-            "-safe", "0",
-            "-i", temp_file_path,
-            # set quality (constant rate factor, crf): 51=worst, 0=best
-            # "-crf", str(quality),
-            # video codec: H.264
-            "-c:v", "libx264",
-            "-pix_fmt", "yuv420p",
-            # output filename
-            outputPath
-        )
+            subprocess.run([
+                "ffmpeg",
+                "-n", #never overwrite a file
+                "-r", str(frameRate), # output frame rate
+                "-f", "concat",
+                "-safe", "0",
+                "-i", temp_file.name,
+                "-crf", str(quality), # set quality (constant rate factor, crf): 51=worst, 0=best
+                "-c:v", "libx264", # video codec: H.264
+                "-pix_fmt", "yuv420p",
+                outputPath
+            ], cwd=inputPath)
 
-        subprocess.run([
-            "ffmpeg",
-            # output frame rate
-            "-r", "1",
-            "-f", "concat",
-            "-safe", "0",
-            "-i", temp_file_path,
-            # set quality (constant rate factor, crf): 51=worst, 0=best
-            # "-crf", str(quality),
-            # video codec: H.264
-            "-c:v", "libx264",
-            "-pix_fmt", "yuv420p",
-            # output filename
-            outputPath
-        ], cwd=inputPath)
-        # ffmpeg -r 1 -f concat -safe 0 -i fileNames.txt -c:v libx264 -pix_fmt yuv420p output.mp4
+            os.remove(temp_file.name)
 
-        os.remove(temp_file_path)
 
     # -------- Cell Type (colors) widgets CBs
     def typeColorTableClicked(self):
@@ -670,6 +634,8 @@ class ConfigurationDialog(QDialog, ui_configurationdlg.Ui_CC3DPrefs, Configurati
         Configuration.setSetting("LogLevel", "LOG_"+self.log_level_combo.currentText())
         Configuration.setSetting("LogToFile", self.write_log_CB.isChecked())
 
+        #Movie settings
+        Configuration.setSetting("FrameRate", self.frameRateSpinBox.value())
 
         if str(self.outputLocationLineEdit.text()).rstrip() == '':
             Configuration.setSetting("OutputLocation", os.path.join(os.path.expanduser('~'), 'CC3DWorkspace'))
@@ -774,6 +740,9 @@ class ConfigurationDialog(QDialog, ui_configurationdlg.Ui_CC3DPrefs, Configurati
 
         self.min_max_display_CB.setChecked(Configuration.getSetting("DisplayMinMaxInfo"))
         self.pause_at_LE.setText(Configuration.getSetting("PauseAt"))
+
+        # Movie settings
+        self.frameRateSpinBox.setValue(Configuration.getSetting("FrameRate"))
 
         # Cell Type/Colors
         self.populateCellColors()

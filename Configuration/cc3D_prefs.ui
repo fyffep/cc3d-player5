@@ -644,7 +644,7 @@
             </spacer>
            </item>
            <item>
-            <widget class="QLineEdit" name="frameRateLineEdit"/>
+            <widget class="QSpinBox" name="frameRateSpinBox"/>
            </item>
            <item>
             <spacer name="horizontalSpacer_30">

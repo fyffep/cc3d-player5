@@ -24,6 +24,7 @@
       <e Name="Screenshot_X" Type="int">600</e>
       <e Name="Screenshot_Y" Type="int">600</e>
       <e Name="TabIndex" Type="int">2</e>
+      <e Name="FrameRate" Type="int">4</e>
    </Settings>
    <Settings Type="float">
       <e Name="ArrowLength" Type="float">1</e>
