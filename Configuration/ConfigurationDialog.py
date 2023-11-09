@@ -143,7 +143,8 @@ class ConfigurationDialog(QDialog, ui_configurationdlg.Ui_CC3DPrefs, Configurati
     def createMovieButtonClicked(self):
 
         #TODO
-        inputPath = 'C:/Users/Pete/CC3DWorkspace/cellsort_2D_cc3d_11_04_2023_19_53_54/Cell_Field_CellField_2D_XY_25'
+        # inputPath = 'C:/Users/Pete/CC3DWorkspace/cellsort_2D_cc3d_11_04_2023_19_53_54/Cell_Field_CellField_2D_XY_25'
+        inputPath = 'C:/Users/Pete/CC3DWorkspace/GerminalCenterMigration_cc3d_08_14_2023_15_33_03/Cell_Field_CellField_2D_XY_0'
 
         temp_file_path = None
         with tempfile.NamedTemporaryFile(delete=False, mode='+a', dir=inputPath) as temp_file:
@@ -156,16 +157,24 @@ class ConfigurationDialog(QDialog, ui_configurationdlg.Ui_CC3DPrefs, Configurati
             temp_file.close()
 
             frameRate = min(self.frameRateSpinBox.value(), 1);
-            quality = 30
+            quality = float(self.movieQualitySpinBox.value())
+            # Convert from 1-10 domain to 0-51 domain
+            quality = int((1.0 - (quality/10.0)) * 52.0) - 1;
 
             #Number the file name so that it does not overwrite another movie
             fileNumber = 0
-            outputPath = 'C:/Users/Pete/CC3DWorkspace/cellsort_2D_cc3d_11_04_2023_19_53_54/movies/'
+            # outputPath = 'C:/Users/Pete/CC3DWorkspace/cellsort_2D_cc3d_11_04_2023_19_53_54/movies/'
+            outputPath = 'C:/Users/Pete/CC3DWorkspace/GerminalCenterMigration_cc3d_08_14_2023_15_33_03/movies'
+            subprocess.run([
+                "mkdir", outputPath
+            ])
+
             while os.path.exists(os.path.join(outputPath, f"movie{fileNumber}.mp4")):
                 fileNumber += 1
             outputPath = os.path.join(outputPath, f"movie{fileNumber}.mp4")
 
             # TODO test if inputPath can contain spaces
+            # TODO handle when FFMPEG is not found
 
             subprocess.run([
                 "ffmpeg",
