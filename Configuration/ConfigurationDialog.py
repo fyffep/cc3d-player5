@@ -141,55 +141,70 @@ class ConfigurationDialog(QDialog, ui_configurationdlg.Ui_CC3DPrefs, Configurati
     # -------- Movie widgets CBs
 
     def createMovieButtonClicked(self):
+        #Choose the most recently modified subdir of the project dir
+        projectPathRoot = Configuration.getSetting('OutputLocation')
+        maxLastModifiedTime = 0
+        simulationPath = None
+        for dirName in os.listdir(projectPathRoot):
+            dirPath = os.path.join(projectPathRoot, dirName)
+            if os.path.isdir(dirPath):
+                if os.path.getmtime(dirPath) > maxLastModifiedTime:
+                    maxLastModifiedTime = os.path.getmtime(dirPath)
+                    simulationPath = dirPath
 
-        #TODO
-        # inputPath = 'C:/Users/Pete/CC3DWorkspace/cellsort_2D_cc3d_11_04_2023_19_53_54/Cell_Field_CellField_2D_XY_25'
-        inputPath = 'C:/Users/Pete/CC3DWorkspace/GerminalCenterMigration_cc3d_08_14_2023_15_33_03/Cell_Field_CellField_2D_XY_0'
+        print("Making movie inside `", simulationPath, "`")
 
-        temp_file_path = None
-        with tempfile.NamedTemporaryFile(delete=False, mode='+a', dir=inputPath) as temp_file:
-            # 'delete=True' removes the temporary file when it is closed.
-            # So, setting 'delete=True' ensures that the tempfile stays active long enough for FFMPEG to read it.
+        for visualizationName in os.listdir(simulationPath):
+            inputPath = os.path.join(simulationPath, visualizationName)
+            if not os.path.isdir(inputPath):
+                continue
 
-            for fileName in os.listdir(inputPath):
-                if fileName.lower().endswith(".png"):
-                    temp_file.write(f"file '{fileName}'\n")
-            temp_file.close()
+            temp_file_path = None
+            with tempfile.NamedTemporaryFile(delete=False, mode='+a', dir=inputPath) as temp_file:
+                # 'delete=True' removes the temporary file when it is closed.
+                # So, setting 'delete=True' ensures that the tempfile stays active long enough for FFMPEG to read it.
 
-            frameRate = min(self.frameRateSpinBox.value(), 1);
-            quality = float(self.movieQualitySpinBox.value())
-            # Convert from 1-10 domain to 0-51 domain
-            quality = int((1.0 - (quality/10.0)) * 52.0) - 1;
+                frameCount = 0
+                for fileName in os.listdir(inputPath):
+                    if fileName.lower().endswith(".png"):
+                        temp_file.write(f"file '{fileName}'\n")
+                        frameCount += 1
+                temp_file.close()
 
-            #Number the file name so that it does not overwrite another movie
-            fileNumber = 0
-            # outputPath = 'C:/Users/Pete/CC3DWorkspace/cellsort_2D_cc3d_11_04_2023_19_53_54/movies/'
-            outputPath = 'C:/Users/Pete/CC3DWorkspace/GerminalCenterMigration_cc3d_08_14_2023_15_33_03/movies'
-            subprocess.run([
-                "mkdir", outputPath
-            ])
+                if frameCount > 0:
+                    frameRate = min(self.frameRateSpinBox.value(), 1);
+                    quality = float(self.movieQualitySpinBox.value())
+                    # Convert from 1-10 domain to 0-51 domain
+                    quality = int((1.0 - (quality/10.0)) * 52.0) - 1;
 
-            while os.path.exists(os.path.join(outputPath, f"movie{fileNumber}.mp4")):
-                fileNumber += 1
-            outputPath = os.path.join(outputPath, f"movie{fileNumber}.mp4")
+                    #Number the file name so that it does not overwrite another movie
+                    fileNumber = 0
+                    outputPath = os.path.join(simulationPath, "movies")
+                    subprocess.run([
+                        "mkdir", outputPath
+                    ])
 
-            # TODO test if inputPath can contain spaces
-            # TODO handle when FFMPEG is not found
+                    while os.path.exists(os.path.join(outputPath, f"{visualizationName}{fileNumber}.mp4")):
+                        fileNumber += 1
+                    outputPath = os.path.join(outputPath, f"{visualizationName}{fileNumber}.mp4")
 
-            subprocess.run([
-                "ffmpeg",
-                "-n", #never overwrite a file
-                "-r", str(frameRate), # output frame rate
-                "-f", "concat",
-                "-safe", "0",
-                "-i", temp_file.name,
-                "-crf", str(quality), # set quality (constant rate factor, crf): 51=worst, 0=best
-                "-c:v", "libx264", # video codec: H.264
-                "-pix_fmt", "yuv420p",
-                outputPath
-            ], cwd=inputPath)
+                    # TODO test if inputPath can contain spaces
+                    # TODO handle when FFMPEG is not found
 
-            os.remove(temp_file.name)
+                    subprocess.run([
+                        "ffmpeg",
+                        "-n", #never overwrite a file
+                        "-r", str(frameRate), # output frame rate
+                        "-f", "concat",
+                        "-safe", "0",
+                        "-i", temp_file.name,
+                        "-crf", str(quality), # set quality (constant rate factor, crf): 51=worst, 0=best
+                        "-c:v", "libx264", # video codec: H.264
+                        "-pix_fmt", "yuv420p",
+                        outputPath
+                    ], cwd=inputPath)
+
+                os.remove(temp_file.name)
 
 
     # -------- Cell Type (colors) widgets CBs
