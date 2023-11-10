@@ -621,155 +621,64 @@
          <item>
           <layout class="QHBoxLayout" name="horizontalLayout_39">
            <item>
-            <widget class="QLabel" name="label_29">
-             <property name="text">
-              <string>Video Output Directory</string>
-             </property>
-            </widget>
+            <layout class="QFormLayout" name="formLayout_3">
+             <item row="0" column="0">
+              <widget class="QLabel" name="label_26">
+               <property name="text">
+                <string>Frame Rate</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QSpinBox" name="frameRateSpinBox">
+               <property name="minimumSize">
+                <size>
+                 <width>60</width>
+                 <height>0</height>
+                </size>
+               </property>
+               <property name="maximum">
+                <number>360</number>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <widget class="QLabel" name="label_27">
+               <property name="text">
+                <string>Quality (1=worst, 10=best)</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="QSpinBox" name="movieQualitySpinBox">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>60</width>
+                 <height>0</height>
+                </size>
+               </property>
+               <property name="maximum">
+                <number>51</number>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="0">
+              <widget class="QCheckBox" name="automaticMovieCheckBox">
+               <property name="text">
+                <string>Save movie automatically every time a simulation stops</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
            </item>
            <item>
-            <spacer name="horizontalSpacer_33">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeType">
-              <enum>QSizePolicy::Fixed</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item>
-            <widget class="QLineEdit" name="movieOutputLineEdit"/>
-           </item>
-           <item>
-            <widget class="QPushButton" name="chooseMovieOutputButton">
-             <property name="maximumSize">
-              <size>
-               <width>150</width>
-               <height>16777215</height>
-              </size>
-             </property>
-             <property name="text">
-              <string>Choose</string>
-             </property>
-             <property name="autoDefault">
-              <bool>false</bool>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QCheckBox" name="outputToProjectCheckBox_2">
-             <property name="text">
-              <string>=Project</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </item>
-         <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_36">
-           <item>
-            <widget class="QLabel" name="label_26">
-             <property name="text">
-              <string>Frame Rate</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <spacer name="horizontalSpacer_29">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeType">
-              <enum>QSizePolicy::Fixed</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item>
-            <widget class="QSpinBox" name="frameRateSpinBox">
-             <property name="minimumSize">
-              <size>
-               <width>40</width>
-               <height>0</height>
-              </size>
-             </property>
-             <property name="maximum">
-              <number>360</number>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <spacer name="horizontalSpacer_30">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-          </layout>
-         </item>
-         <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_37">
-           <item>
-            <widget class="QLabel" name="label_27">
-             <property name="text">
-              <string>Quality (51=worst, 0=best)</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <spacer name="horizontalSpacer_35">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeType">
-              <enum>QSizePolicy::Fixed</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item>
-            <widget class="QSpinBox" name="movieQualitySpinBox">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="minimumSize">
-              <size>
-               <width>40</width>
-               <height>0</height>
-              </size>
-             </property>
-             <property name="maximum">
-              <number>51</number>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <spacer name="horizontalSpacer_36">
+            <spacer name="horizontalSpacer_37">
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
              </property>
@@ -788,7 +697,7 @@
            <item>
             <widget class="QLabel" name="label_28">
              <property name="text">
-              <string>FFMPEG Location</string>
+              <string>FFMPEG Executable</string>
              </property>
             </widget>
            </item>
@@ -812,7 +721,7 @@
             <widget class="QLineEdit" name="ffmpegLocationLineEdit"/>
            </item>
            <item>
-            <widget class="QPushButton" name="chooseFfmpegLocation">
+            <widget class="QPushButton" name="resetFfmpegLocationButton">
              <property name="maximumSize">
               <size>
                <width>150</width>
@@ -820,7 +729,7 @@
               </size>
              </property>
              <property name="text">
-              <string>Choose</string>
+              <string>Reset</string>
              </property>
              <property name="autoDefault">
               <bool>false</bool>
@@ -828,13 +737,6 @@
             </widget>
            </item>
           </layout>
-         </item>
-         <item>
-          <widget class="QCheckBox" name="automaticMovieCheckBox">
-           <property name="text">
-            <string>Save movie automatically every time a simulation stops</string>
-           </property>
-          </widget>
          </item>
          <item>
           <spacer name="verticalSpacer_5">
@@ -853,9 +755,9 @@
           </spacer>
          </item>
          <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_41">
+          <layout class="QHBoxLayout" name="horizontalLayout_40">
            <item>
-            <spacer name="horizontalSpacer_37">
+            <spacer name="horizontalSpacer_32">
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
              </property>
@@ -881,7 +783,7 @@
             </widget>
            </item>
            <item>
-            <spacer name="horizontalSpacer_38">
+            <spacer name="horizontalSpacer_34">
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
              </property>
@@ -896,20 +798,31 @@
           </layout>
          </item>
          <item>
-          <spacer name="verticalSpacer_6">
-           <property name="orientation">
-            <enum>Qt::Vertical</enum>
-           </property>
-           <property name="sizeType">
-            <enum>QSizePolicy::Expanding</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>20</width>
-             <height>40</height>
-            </size>
-           </property>
-          </spacer>
+          <layout class="QVBoxLayout" name="verticalLayout_26">
+           <item>
+            <widget class="QLabel" name="createMovieResultLabel">
+             <property name="text">
+              <string/>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="verticalSpacer">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
          </item>
         </layout>
        </widget>

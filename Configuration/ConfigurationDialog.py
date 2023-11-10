@@ -12,6 +12,7 @@ from cc3d.player5.Utilities.utils import assign_cell_type_colors
 
 import subprocess
 import tempfile
+import shutil
 
 MAC = "qt_mac_set_native_menubar" in dir()
 
@@ -56,6 +57,8 @@ class ConfigurationDialog(QDialog, ui_configurationdlg.Ui_CC3DPrefs, Configurati
 
         # Cell Type/Colors tab
         self.typeColorTable.clicked.connect(self.typeColorTableClicked)
+        self.ffmpegLocationLineEdit.textChanged.connect(self.ffmpegLocationLineEditChanged)
+        self.resetFfmpegLocationButton.clicked.connect(self.resetFfmpegLocation)
 
         self.cellBorderColorButton.clicked.connect(self.cellBorderColorClicked)
         self.clusterBorderColorButton.clicked.connect(self.clusterBorderColorClicked)
@@ -141,6 +144,10 @@ class ConfigurationDialog(QDialog, ui_configurationdlg.Ui_CC3DPrefs, Configurati
     # -------- Movie widgets CBs
 
     def createMovieButtonClicked(self):
+        if not os.path.exists(Configuration.getSetting('FfmpegLocation')):
+            self.showFfmpegWarning()
+            return
+
         #Choose the most recently modified subdir of the project dir
         projectPathRoot = Configuration.getSetting('OutputLocation')
         maxLastModifiedTime = 0
@@ -153,6 +160,7 @@ class ConfigurationDialog(QDialog, ui_configurationdlg.Ui_CC3DPrefs, Configurati
                     simulationPath = dirPath
 
         print("Making movie inside `", simulationPath, "`")
+        movieCount = 0
 
         for visualizationName in os.listdir(simulationPath):
             inputPath = os.path.join(simulationPath, visualizationName)
@@ -184,12 +192,9 @@ class ConfigurationDialog(QDialog, ui_configurationdlg.Ui_CC3DPrefs, Configurati
                         "mkdir", outputPath
                     ])
 
-                    while os.path.exists(os.path.join(outputPath, f"{visualizationName}{fileNumber}.mp4")):
+                    while os.path.exists(os.path.join(outputPath, f"{visualizationName}_{fileNumber}.mp4")):
                         fileNumber += 1
-                    outputPath = os.path.join(outputPath, f"{visualizationName}{fileNumber}.mp4")
-
-                    # TODO test if inputPath can contain spaces
-                    # TODO handle when FFMPEG is not found
+                    outputPath = os.path.join(outputPath, f"{visualizationName}_{fileNumber}.mp4")
 
                     subprocess.run([
                         "ffmpeg",
@@ -204,7 +209,51 @@ class ConfigurationDialog(QDialog, ui_configurationdlg.Ui_CC3DPrefs, Configurati
                         outputPath
                     ], cwd=inputPath)
 
+                    if os.path.exists(outputPath):
+                        movieCount += 1
+
                 os.remove(temp_file.name)
+
+        self.displayMovieResult(movieCount)
+
+    def displayMovieResult(self, movieCount):
+        if movieCount < 1:
+            self.createMovieResultLabel.setText("No movies were made")
+        elif movieCount == 1:
+            self.createMovieResultLabel.setText("Movie successfully made")
+        else:
+            self.createMovieResultLabel.setText(str(movieCount) + " movies successfully made")
+        self.createMovieResultLabel.setVisible(True)
+
+        timer = None
+        def hideLabel():
+            self.createMovieResultLabel.setVisible(False)
+            timer.stop()
+
+        timer = QTimer(self)
+        timer.timeout.connect(hideLabel)
+        timer.start(5000)
+
+    def ffmpegLocationLineEditChanged(self, newText):
+        Configuration.setSetting('FfmpegLocation', newText)
+
+    def resetFfmpegLocation(self):
+        ffmpegLocation = shutil.which("ffmpeg")
+        if not ffmpegLocation:
+            self.showFfmpegWarning()
+            return
+
+        Configuration.setSetting("FfmpegLocation", ffmpegLocation)
+        self.ffmpegLocationLineEdit.setText(ffmpegLocation)
+
+        return ffmpegLocation
+
+    def showFfmpegWarning(self):
+        QMessageBox.warning(None, "WARN",
+                            "FFMPEG executable not found. "
+                            "Please install FFMPEG or, if you already have it, specify its path manually "
+                            "in the FFMPEG Executable box.",
+                            QMessageBox.Ok)
 
 
     # -------- Cell Type (colors) widgets CBs
@@ -767,6 +816,13 @@ class ConfigurationDialog(QDialog, ui_configurationdlg.Ui_CC3DPrefs, Configurati
 
         # Movie settings
         self.frameRateSpinBox.setValue(Configuration.getSetting("FrameRate"))
+        self.movieQualitySpinBox.setValue(Configuration.getSetting("Quality"))
+        self.automaticMovieCheckBox.setChecked(Configuration.getSetting("AutomaticMovie"))
+        self.createMovieResultLabel.setText("")
+        ffmpegLocation = Configuration.getSetting("FfmpegLocation")
+        if not ffmpegLocation:
+            ffmpegLocation = self.resetFfmpegLocation()
+        self.ffmpegLocationLineEdit.setText(ffmpegLocation)
 
         # Cell Type/Colors
         self.populateCellColors()
